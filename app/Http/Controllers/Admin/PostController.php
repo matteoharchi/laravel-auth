@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Post;
+use App\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -17,7 +18,8 @@ class PostController extends Controller
      */
     public function index()
     {
-        //
+        $posts= Post::where('user_id', Auth::id())->orderBy('id', 'desc')->get(); //in questo modo mi prende solo quelli dello stesso utente loggato
+        return view('admin.posts.index', compact('posts'));
     }
 
     /**
@@ -27,7 +29,8 @@ class PostController extends Controller
      */
     public function create()
     {
-        return view('admin.posts.create');
+        $tags= Tag::all();
+        return view('admin.posts.create', compact('tags'));
     }
 
     /**
@@ -48,7 +51,8 @@ class PostController extends Controller
         $newPost= new Post();
         $newPost->fill($data);
         $saved = $newPost->save();
-        dd($saved);
+        $id_post= $newPost->id;
+        $newPost->tags()->attach($data['tags']);
     }
 
     /**
@@ -70,7 +74,8 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        //
+        $newPost->tags->attach($tagId);
+        return view('admin.posts.edit', compact('post'));
     }
 
     /**
@@ -82,7 +87,10 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        //
+        $data=$request->all(); //racchiude tutte le info di request in un array
+        $data['slug']= Str::slug($data['title'], '-'); //The Str::slug method generates a URL friendly "slug" from the given string
+        $post->tags()->sync($data['tags']);
+        $post->update($data); //aggiorna i valori
     }
 
     /**
@@ -93,6 +101,7 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        $post->delete();
+        return redirect()->route('posts.index')->with('status', 'post cancellato');
     }
 }

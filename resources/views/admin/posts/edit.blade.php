@@ -11,22 +11,16 @@
         </ul>
     </div>
 @endif
-<form action="{{route('posts.store')}}" method="post">
+<form action="{{route('posts.update')}}" method="post">
 @csrf
-@method('POST')
+@method('PATCH')
   <div class="form-group">
     <label for="title">Titolo</label>
-    <input type="text" name='title' class="form-control" placeholder="Inserisci il titolo">
+    <input type="text" name='title' class="form-control" placeholder="Inserisci il titolo" value="{{$post->title}}">
   </div>
   <div class="form-group">
     <label name='body' for="body">Corpo del post</label>
-    <textarea class="form-control" name="body" rows="3"></textarea>
-  </div>
-  <div class="form-group">
-    @foreach($tags as $tag)
-      <label for="tag">{{$tag->name}}</label>
-      <input type="checkbox" name="tags[]" value="{{$tag->id}}">
-    @endforeach
+    <textarea class="form-control" name="body" rows="3" value="{{$post->body}}"></textarea>
   </div>
     <button type="submit" class="btn btn-primary mb-2">Invia</button>
 </form>
