@@ -28,6 +28,10 @@
       <input type="checkbox" name="tags[]" value="{{$tag->id}}">
     @endforeach
   </div>
+  <div class="form-group">
+  <label for="img">Immagine</label>
+  <input type="file" name="img" class="form-control-file" accept="image/*">
+  </div>
     <button type="submit" class="btn btn-primary mb-2">Invia</button>
 </form>
 

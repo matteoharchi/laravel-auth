@@ -17,6 +17,7 @@ class CreatePostsTable extends Migration
             $table->id();
             $table->string('title')->unique; //faccio in modo che non ci siano più post con lo stesso titolo
             $table->longtext('body');
+            $table->string('img');
             $table->string('slug')->unique;
             $table->timestamps();
             $table->unsignedBigInteger('user_id');

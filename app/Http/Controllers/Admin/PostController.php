@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Post;
 use App\Tag;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 
 class PostController extends Controller
@@ -18,7 +20,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts= Post::where('user_id', Auth::id())->orderBy('id', 'desc')->get(); //in questo modo mi prende solo quelli dello stesso utente loggato
+        $posts= Post::where('user_id', Auth::id())->orderBy('id', 'desc')->simplePaginate(5); //in questo modo mi prende solo quelli dello stesso utente loggato
         return view('admin.posts.index', compact('posts'));
     }
 
@@ -49,6 +51,9 @@ class PostController extends Controller
         $data['user_id'] = Auth::id();
         $data['slug']= Str::slug($data['title'], '-');
         $newPost= new Post();
+        if (!empty($data['img'])) {
+            $data['img']=Storage::disk('public')->put('images', $data['img']);
+        }
         $newPost->fill($data);
         $saved = $newPost->save();
         $id_post= $newPost->id;
@@ -74,8 +79,8 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        $newPost->tags->attach($tagId);
-        return view('admin.posts.edit', compact('post'));
+        $tags= Tag::all();
+        return view('admin.posts.edit', compact('post', 'tags'));
     }
 
     /**
@@ -87,10 +92,22 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
+        
         $data=$request->all(); //racchiude tutte le info di request in un array
+        $data['user_id']= Auth::id();
         $data['slug']= Str::slug($data['title'], '-'); //The Str::slug method generates a URL friendly "slug" from the given string
         $post->tags()->sync($data['tags']);
+        $data['updated_at']= Carbon::now('Europe/Rome');
+        if (!empty($data['img'])) {
+            $data['img']=Storage::disk('public')->put('images', $data['img']);
+        }
+        if (!empty($data['tags'])) {
+            $post->tags()->sync($data['tags']);
+        }
         $post->update($data); //aggiorna i valori
+        if ($post) {
+            return redirect()->route('posts.index')->with('session', "L'elemento $post->title è stato modificato");
+        }
     }
 
     /**

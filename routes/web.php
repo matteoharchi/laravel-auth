@@ -29,3 +29,7 @@ Route::prefix('admin')->namespace('Admin')->middleware('auth')->group(function (
 //come alternativa a:
 // Route::get('admin/home', 'Admin\HomeController@index')->name('home');
 //il middleware in questo caso è una ripetizione, può essere tolto da qui o dal costruttore di HomeController, in questo caso l'ho tolto dal secondo.
+
+//guest
+Route::get('posts', 'PostController@index')->name('guest.posts.home');
+Route::get('posts/show/{slug}', 'PostController@show')->name('guest.posts.show');
