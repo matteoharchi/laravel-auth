@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('content')
-<table class="table table-dark">
+<a href="{{route('posts.create')}}"><button class="create-button btn btn-primary">Crea Post</button></a>
+<table class="table">
   <thead>
     <tr>
       <th scope="col">#</th>
@@ -18,7 +19,7 @@
           <form action="{{route('posts.destroy', $post->id)}}" method="POST">
               @csrf
               @method('DELETE')
-              <button type="submit" class="btn btn-primary">Delete</button>
+              <button type="submit" class="btn btn-danger">Delete</button>
           </form>
       </td>
       <td><a href="{{route('posts.edit', $post->id)}}">Edit</a></td>
@@ -27,4 +28,5 @@
   @endforeach
   </tbody>
 </table>
+{{ $posts->links() }}
 @endsection

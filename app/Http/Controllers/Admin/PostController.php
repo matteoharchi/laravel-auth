@@ -20,7 +20,13 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts= Post::where('user_id', Auth::id())->orderBy('id', 'desc')->simplePaginate(5); //in questo modo mi prende solo quelli dello stesso utente loggato
+        //avendo costruito un modello Role, posso ora diversificare le index degli utenti che avranno permessi di admin dai normali utenti
+        // dd(Auth::user()->role->role);
+        if (Auth::user()->role->role == 'admin') {
+            $posts=Post::simplePaginate(10);
+        }elseif (Auth::user()->role->role == 'user') {
+            $posts= Post::where('user_id', Auth::id())->orderBy('id', 'desc')->simplePaginate(10); //in questo modo mi prende solo quelli dello stesso utente loggato
+        }
         return view('admin.posts.index', compact('posts'));
     }
 
